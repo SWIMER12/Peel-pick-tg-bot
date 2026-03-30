@@ -1,10 +1,10 @@
-import telebot, requests
+import telebot, requests,os
 from random import sample
 from telebot import types
 from flask import Flask
 
-TOKEN = "YOUR_TOKEN"
-API_KEY = "YOUR_API_KEY"
+TOKEN = os.environ.get("TELEGRAM_TOKEN")
+API_KEY = os.environ.get("TMDB_API_KEY")
 
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
