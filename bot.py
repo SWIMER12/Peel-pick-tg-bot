@@ -10,46 +10,66 @@ bot = telebot.TeleBot(TOKEN)
 class Movie:
     def __init__(self, data):
         self.data = data
+
     def infoMovie(self):
-        title = self.data["title"] if self.data["title"] else self.data["original_title"]
-        
-        year = self.data["release_date"].split("-")[0] if self.data["release_date"] else "Год не указан"
-        
-        tagline = self.data["tagline"] if self.data["tagline"] else None
-        
-        overview = self.data["overview"] if self.data["overview"] else "Описание отсутствует"
-        
-        vote_average = round(self.data["vote_average"],1) if self.data["vote_count"] else "Данных об оценке нет"
-        
+        title = self.data.get("title") or self.data.get("original_title")
+
+        release_date = self.data.get("release_date")
+        year = release_date.split("-")[0] if release_date else "Год не указан"
+
+        tagline = self.data.get("tagline") or None
+
+        overview = self.data.get("overview") or "Описание отсутствует"
+
+        vote_average = (
+            round(self.data.get("vote_average", 0), 1)
+            if self.data.get("vote_count")
+            else "Данных об оценке нет"
+        )
+
         caption = f"{title} ({year})\n"
+
         if tagline:
             caption += f"{tagline}\n"
+
         caption += f"\n{overview}\n\nОценка: {vote_average}"
-        
-        poster = "https://image.tmdb.org/t/p/w500" + self.data["poster_path"] if self.data["poster_path"] else None
-        
-        videos = self.data["videos"]["results"] if self.data["videos"] and self.data["videos"]["results"] else []
+
+        poster = None
+        if self.data.get("poster_path"):
+            poster = "https://image.tmdb.org/t/p/w500" + self.data["poster_path"]
+
+        videos = self.data.get("videos", {}).get("results", [])
         trailer_url = None
+
         for video in videos:
-            if video["type"] == "Trailer" and video["site"] == "YouTube":
+            if video.get("type") == "Trailer" and video.get("site") == "YouTube":
                 trailer_url = f"https://www.youtube.com/watch?v={video['key']}"
                 break
-        
-        if not trailer_url and videos:
+
+        if not trailer_url:
             for video in videos:
-                if video["site"] == "YouTube":
+                if video.get("site") == "YouTube":
                     trailer_url = f"https://www.youtube.com/watch?v={video['key']}"
                     break
-        
-        site = f"https://www.themoviedb.org/movie/{self.data['id']}"
-        return {"caption": caption, "poster":poster, "trailer":trailer_url, "site":site}
+
+        site = f"https://www.themoviedb.org/movie/{self.data.get('id')}"
+
+        return {
+            "caption": caption,
+            "poster": poster,
+            "trailer": trailer_url,
+            "site": site
+        }
 
     def title(self):
-        title = self.data["title"] if self.data["title"] else self.data["original_title"]
-        year = self.data["release_date"].split("-")[0] if self.data["release_date"] else "Год не указан"
+        title = self.data.get("title") or self.data.get("original_title")
+
+        release_date = self.data.get("release_date")
+        year = release_date.split("-")[0] if release_date else "Год не указан"
+
         caption = f"{title} ({year})\n🎬 Нажми «Читать далее», чтобы открыть карточку фильма"
-        movie_id = self.data["id"]
-        return {"caption":caption,"id":movie_id}
+
+        return {"caption": caption, "id": self.data.get("id")}
 
 def superMovie(user_url, user_params, mode):
     super_params = {"api_key": API_KEY,
