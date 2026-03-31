@@ -9,9 +9,12 @@ API_KEY = os.environ.get("TMDB_API_KEY")
 bot = telebot.TeleBot(TOKEN)
 app = Flask(__name__)
 
-WEBHOOK_URL = f"https://tmdb-tg.onrender.com/{TOKEN}"  # Render даст URL твоего сервиса
-bot.remove_webhook()
-bot.set_webhook(url=WEBHOOK_URL)
+WEBHOOK_URL = f"https://tmdb-tg.onrender.com/{TOKEN}"
+
+@app.before_first_request
+def setup_webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url=WEBHOOK_URL)
 
 @app.route(f"/{TOKEN}", methods=["POST"])
 def webhook():
