@@ -19,12 +19,12 @@ def setup_webhook():
 
 @app.route(f"/{TOKEN}", methods=["POST"])
 def webhook():
-    if 'application/json' in request.headers.get('content-type', ''):
-        json_string = request.get_data().decode('utf-8')
-        update = telebot.types.Update.de_json(json_string)
-        bot.process_new_updates([update])
-        return '', 200
-    return 'ok'
+    print("Update received")
+    json_string = request.get_data().decode('utf-8')
+    print(json_string)
+    update = telebot.types.Update.de_json(json_string)
+    bot.process_new_updates([update])
+    return "ok", 200
 
 @app.route("/")
 def index():
