@@ -261,7 +261,8 @@ def discover(message):
         bot.send_message(message.chat.id,"🎭 Кажется, ты забыл написать жанр 😅\nПопробуй, например:\n /genre боевик комедия\n\nСписок доступных жанров есть в /help")
     genres = []
     for i in genre:
-        genres.append(genre_list[i])
+        if i in genre_list:
+            genres.append(genre_list[i])
     
     list_of_movies = superMovie("/discover/movie",{"with_genres": ",".join(map(str, genres)), "vote_average.gte": 7, "vote_count.gte": 200},"random")
     if type(list_of_movies) == str:
