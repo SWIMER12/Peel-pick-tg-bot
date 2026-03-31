@@ -11,8 +11,9 @@ app = Flask(__name__)
 
 WEBHOOK_URL = f"https://tmdb-tg.onrender.com/{TOKEN}"
 
-bot.remove_webhook()
-bot.set_webhook(url=WEBHOOK_URL)
+def setup_webhook():
+    bot.remove_webhook()
+    bot.set_webhook(url=WEBHOOK_URL)
 
 @app.route(f"/{TOKEN}", methods=["POST"])
 def webhook():
@@ -301,5 +302,6 @@ def handle_photo(message):
 
 
 if __name__ == "__main__":
+    setup_webhook()
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
